@@ -32,6 +32,7 @@ import (
 	is "gotest.tools/v3/assert/cmp"
 
 	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/compose-spec/compose-go/v2/types/extensions"
 )
 
 func buildConfigDetails(yaml string, env map[string]string) types.ConfigDetails {
@@ -107,39 +108,39 @@ networks:
         - subnet: 172.28.0.0/16
 `
 
-var sampleDict = map[string]interface{}{
+var sampleDict = extensions.Map{
 	"name": "sample",
-	"services": map[string]interface{}{
-		"foo": map[string]interface{}{
+	"services": extensions.Map{
+		"foo": extensions.Map{
 			"image":    "busybox",
-			"networks": map[string]interface{}{"with_me": nil},
+			"networks": extensions.Map{"with_me": nil},
 		},
-		"bar": map[string]interface{}{
+		"bar": extensions.Map{
 			"image":       "busybox",
 			"environment": []interface{}{"FOO=1"},
 			"networks":    []interface{}{"with_ipam"},
 		},
 	},
-	"volumes": map[string]interface{}{
-		"hello": map[string]interface{}{
+	"volumes": extensions.Map{
+		"hello": extensions.Map{
 			"driver": "default",
-			"driver_opts": map[string]interface{}{
+			"driver_opts": extensions.Map{
 				"beep": "boop",
 			},
 		},
 	},
-	"networks": map[string]interface{}{
-		"default": map[string]interface{}{
+	"networks": extensions.Map{
+		"default": extensions.Map{
 			"driver": "bridge",
-			"driver_opts": map[string]interface{}{
+			"driver_opts": extensions.Map{
 				"beep": "boop",
 			},
 		},
-		"with_ipam": map[string]interface{}{
-			"ipam": map[string]interface{}{
+		"with_ipam": extensions.Map{
+			"ipam": extensions.Map{
 				"driver": "default",
 				"config": []interface{}{
-					map[string]interface{}{
+					extensions.Map{
 						"subnet": "172.28.0.0/16",
 					},
 				},
@@ -320,23 +321,23 @@ services:
     develop:
       x-dev: dev`)
 	assert.NilError(t, err)
-	assert.Check(t, is.DeepEqual(types.Extensions{
+	assert.Check(t, is.DeepEqual(extensions.Map{
 		"x-project": "project",
 	}, actual.Extensions))
 	assert.Check(t, is.Len(actual.Services, 1))
 	service := actual.Services["foo"]
 	assert.Check(t, is.Equal("busybox", service.Image))
 
-	assert.Check(t, is.DeepEqual(types.Extensions{
+	assert.Check(t, is.DeepEqual(extensions.Map{
 		"x-foo": "bar",
 	}, service.Extensions))
-	assert.Check(t, is.DeepEqual(types.Extensions{
+	assert.Check(t, is.DeepEqual(extensions.Map{
 		"x-config-ext": "config",
 	}, actual.Configs["x-config-name"].Extensions))
-	assert.Check(t, is.DeepEqual(types.Extensions{
+	assert.Check(t, is.DeepEqual(extensions.Map{
 		"x-dev": "dev",
 	}, service.Develop.Extensions))
-	assert.Check(t, is.DeepEqual(types.Extensions{
+	assert.Check(t, is.DeepEqual(extensions.Map{
 		"x-healthcheck": "health",
 	}, service.HealthCheck.Extensions))
 }
@@ -856,7 +857,7 @@ networks:
 				Ports: []types.ServicePortConfig{
 					{Target: 555, Mode: "ingress", Protocol: "tcp"},
 					{Target: 34567, Mode: "ingress", Protocol: "tcp"},
-					{Target: 555, Published: "555", Extensions: map[string]interface{}{"x-foo-bar": true}},
+					{Target: 555, Published: "555", Extensions: extensions.Map{"x-foo-bar": true}},
 				},
 				Ulimits: map[string]*types.UlimitsConfig{
 					"nproc":  {Single: 555},
@@ -2431,7 +2432,7 @@ services:
 	project, err := Load(configDetails)
 	assert.NilError(t, err)
 	assert.Equal(t, project.Services["extension"].Name, "extension")
-	assert.Equal(t, project.Services["extension"].Extensions["x-foo"], "bar")
+	assert.Equal(t, project.Services["extension"].Extensions.GetMap()["x-foo"], "bar")
 }
 
 func TestDeviceWriteBps(t *testing.T) {
@@ -3177,7 +3178,7 @@ services:
 		}
 	})
 	assert.NilError(t, err)
-	x := p.Services["test"].Extensions["x-magic"]
+	x := p.Services["test"].Extensions.GetMap()["x-magic"]
 	magic, ok := x.(Magic)
 	assert.Check(t, ok)
 	assert.Equal(t, magic.Foo, "bar")

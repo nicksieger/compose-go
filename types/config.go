@@ -21,7 +21,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/go-viper/mapstructure/v2"
+	"github.com/compose-spec/compose-go/v2/types/extensions"
 )
 
 var (
@@ -64,7 +64,7 @@ type ConfigFile struct {
 	// Content is the raw yaml content. Will be loaded from Filename if not set
 	Content []byte
 	// Config if the yaml tree for this config file. Will be parsed from Content if not set
-	Config map[string]interface{}
+	Config extensions.Extensions
 }
 
 func ToConfigFiles(path []string) (f []ConfigFile) {
@@ -100,7 +100,7 @@ type Secrets map[string]SecretConfig
 type Configs map[string]ConfigObjConfig
 
 // Extensions is a map of custom extension
-type Extensions map[string]interface{}
+type Extensions extensions.Extensions
 
 // MarshalJSON makes Config implement json.Marshaler
 func (c Config) MarshalJSON() ([]byte, error) {
@@ -120,16 +120,8 @@ func (c Config) MarshalJSON() ([]byte, error) {
 	if len(c.Configs) > 0 {
 		m["configs"] = c.Configs
 	}
-	for k, v := range c.Extensions {
+	for k, v := range c.Extensions.GetMap() {
 		m[k] = v
 	}
 	return json.Marshal(m)
-}
-
-func (e Extensions) Get(name string, target interface{}) (bool, error) {
-	if v, ok := e[name]; ok {
-		err := mapstructure.Decode(v, target)
-		return true, err
-	}
-	return false, nil
 }

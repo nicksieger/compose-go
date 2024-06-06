@@ -23,6 +23,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/compose-spec/compose-go/v2/types/extensions"
+
 	"gopkg.in/yaml.v3"
 
 	"gotest.tools/v3/assert"
@@ -216,8 +218,8 @@ type foo struct {
 }
 
 func TestExtension(t *testing.T) {
-	x := Extensions{
-		"foo": map[string]interface{}{
+	x := extensions.Map{
+		"foo": extensions.Map{
 			"bar": "zot",
 		},
 	}

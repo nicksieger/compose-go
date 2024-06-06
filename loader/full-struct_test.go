@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/compose-spec/compose-go/v2/types"
+	"github.com/compose-spec/compose-go/v2/types/extensions"
 )
 
 func fullExampleProject(workingDir, homeDir string) *types.Project {
@@ -33,10 +34,10 @@ func fullExampleProject(workingDir, homeDir string) *types.Project {
 		Volumes:  volumes(),
 		Configs:  configs(workingDir, homeDir),
 		Secrets:  secrets(workingDir),
-		Extensions: map[string]interface{}{
+		Extensions: extensions.Map{
 			"x-foo": "bar",
 			"x-bar": "baz",
-			"x-nested": map[string]interface{}{
+			"x-nested": extensions.Map{
 				"foo": "bar",
 				"bar": "baz",
 			},
@@ -197,7 +198,7 @@ func services(workingDir, homeDir string) types.Services {
 				"somehost":  []string{"162.242.195.82"},
 				"otherhost": []string{"50.31.209.229"},
 			},
-			Extensions: map[string]interface{}{
+			Extensions: extensions.Map{
 				"x-bar": "baz",
 				"x-foo": "bar",
 			},
@@ -497,7 +498,7 @@ func networks() map[string]types.NetworkConfig {
 		"other-external-network": {
 			Name:     "my-cool-network",
 			External: true,
-			Extensions: map[string]interface{}{
+			Extensions: extensions.Map{
 				"x-bar": "baz",
 				"x-foo": "bar",
 			},
@@ -536,7 +537,7 @@ func volumes() map[string]types.VolumeConfig {
 		"external-volume3": {
 			Name:     "this-is-volume3",
 			External: true,
-			Extensions: map[string]interface{}{
+			Extensions: extensions.Map{
 				"x-bar": "baz",
 				"x-foo": "bar",
 			},
@@ -562,7 +563,7 @@ func configs(workingDir string, homeDir string) map[string]types.ConfigObjConfig
 		"config4": {
 			Name: "foo",
 			File: filepath.Join(homeDir, "config_data"),
-			Extensions: map[string]interface{}{
+			Extensions: extensions.Map{
 				"x-bar": "baz",
 				"x-foo": "bar",
 			},
@@ -588,7 +589,7 @@ func secrets(workingDir string) map[string]types.SecretConfig {
 		"secret4": {
 			Name:        "bar",
 			Environment: "BAR",
-			Extensions: map[string]interface{}{
+			Extensions: extensions.Map{
 				"x-bar": "baz",
 				"x-foo": "bar",
 			},

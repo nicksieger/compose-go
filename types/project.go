@@ -593,7 +593,7 @@ func (p *Project) MarshalJSON() ([]byte, error) {
 	if len(p.Configs) > 0 {
 		m["configs"] = p.Configs
 	}
-	for k, v := range p.Extensions {
+	for k, v := range p.Extensions.GetMap() {
 		m[k] = v
 	}
 	return json.MarshalIndent(m, "", "  ")

@@ -46,3 +46,8 @@ check-license: build-validate-image
 setup: ## Setup the precommit hook
 	@which pre-commit > /dev/null 2>&1 || (echo "pre-commit not installed see README." && false)
 	@pre-commit install
+
+.PHONY: deepcopy-gen
+deepcopy-gen:
+	@which deepcopy-gen || go install k8s.io/code-generator/cmd/deepcopy-gen
+	@deepcopy-gen -v=5 --output-file zz-generated.deepcopy.go ./types
